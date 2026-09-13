@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VinEstate | Live Google Places Lead Engine & CRM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main: #090D14;
+            --bg-card: #121824;
+            --bg-card-hover: #182232;
+            --border: #222F44;
+            --border-highlight: #D8AF58;
+            --gold: #D8AF58;
+            --gold-light: #F3CA7E;
+            --gold-dark: #A37C2C;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --green: #10B981;
+            --green-bg: rgba(16, 185, 129, 0.12);
+            --blue: #38BDF8;
+            --red: #F87171;
+            --purple: #C084FC;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        header {
+            background: rgba(13, 19, 31, 0.95);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .logo-box { display: flex; align-items: center; gap: 0.85rem; }
+        .logo-title { font-family: 'Source Serif 4', serif; font-size: 1.5rem; font-weight: 700; color: var(--gold); letter-spacing: 0.05em; }
+        .logo-tag { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        
+        .header-actions { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
+        .api-pill {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: var(--blue);
+            padding: 0.45rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .api-pill:hover { border-color: var(--blue); background: rgba(56, 189, 248, 0.2); }
+        .api-pill.missing { background: rgba(239, 68, 68, 0.15); border-color: #EF4444; color: #FCA5A5; }
+        
+        .target-pill {
+            background: rgba(216, 175, 88, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold-light);
+            padding: 0.45rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        main { max-width: 1560px; margin: 0 auto; padding: 1.75rem; width: 100%; flex: 1; }
+        
+        /* Stats row */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .stat-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+        .stat-card .val { font-size: 1.75rem; font-weight: 800; color: var(--gold-light); }
+        .stat-card .lbl { font-size: 0.725rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+        
+        /* Live Scraper Engine Bar */
+        .extractor-panel {
+            background: linear-gradient(135deg, rgba(216, 175, 88, 0.15), rgba(18, 24, 36, 0.9));
+            border: 1px solid rgba(216, 175, 88, 0.35);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        .extractor-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .extractor-top h2 { font-size: 1.25rem; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; gap: 0.5rem; }
+        .extractor-top p { font-size: 0.85rem; color: #CBD5E1; margin-top: 0.25rem; }
+        
+        .extractor-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.85rem;
+            align-items: end;
+            background: rgba(9, 13, 20, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.1rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+            font-family: inherit;
+        }
+        .btn-gold { background: var(--gold); color: #090D14; font-weight: 700; }
+        .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 15px rgba(216, 175, 88, 0.35); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--gold); color: var(--gold-light); }
+        .btn-green { background: #10B981; color: #FFFFFF; }
+        .btn-green:hover { background: #059669; }
+        .btn-danger { background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; color: #FCA5A5; }
+        .btn-danger:hover { background: #EF4444; color: #FFFFFF; }
+        .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.8rem; border-radius: 6px; }
+        
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 0.65rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+        .cat-tab {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.65rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .cat-tab.active {
+            background: rgba(216, 175, 88, 0.15);
+            border-color: var(--gold);
+            color: var(--gold-light);
+            font-weight: 700;
+        }
+        .cat-tab:hover:not(.active) { border-color: var(--gold); color: #FFFFFF; }
+        
+        /* Filter Panel */
+        .filter-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 0.85rem;
+            align-items: end;
+        }
+        .filter-group label {
+            display: block;
+            font-size: 0.725rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .form-select, .form-input {
+            width: 100%;
+            background: #090D14;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.55rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-select:focus, .form-input:focus { border-color: var(--gold); }
+        
+        /* Lead Cards */
+        .leads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(470px, 1fr));
+            gap: 1.25rem;
+        }
+        .lead-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.35rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .lead-card:hover {
+            border-color: var(--gold);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .card-top-badges {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .badge-left { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
+        .cat-badge {
+            background: rgba(216, 175, 88, 0.15);
+            color: var(--gold-light);
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .no-website-badge {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #EF4444;
+            color: #FECACA;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.725rem;
+            font-weight: 700;
+        }
+        .has-website-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6EE7B7;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.725rem;
+            font-weight: 600;
+        }
+        .maps-verify-badge {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: var(--blue);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.725rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .maps-verify-badge:hover { background: rgba(56, 189, 248, 0.25); }
+        
+        .biz-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            line-height: 1.35;
+            margin-bottom: 0.35rem;
+        }
+        .loc-text {
+            font-size: 0.825rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.35rem;
+            line-height: 1.4;
+        }
+        
+        .lead-details-table {
+            background: #090D14;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.825rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-bottom: 0.85rem;
+        }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; }
+        .detail-lbl { color: var(--text-muted); font-size: 0.775rem; }
+        .detail-val { font-weight: 600; color: var(--text-main); }
+        
+        /* CRM Section inside Card */
+        .crm-section {
+            background: rgba(18, 24, 36, 0.8);
+            border: 1px solid rgba(216, 175, 88, 0.25);
+            border-radius: 10px;
+            padding: 0.85rem;
+            margin: 0.85rem 0;
+        }
+        .crm-header {
+            font-size: 0.725rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .crm-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+        
+        .status-select {
+            width: 100%;
+            background: #090D14;
+            border: 1px solid var(--border);
+            color: #FFFFFF;
+            padding: 0.45rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-new { color: #93C5FD; border-color: #3B82F6; }
+        .status-interested { color: #86EFAC; border-color: #22C55E; }
+        .status-followup { color: #FDE047; border-color: #EAB308; }
+        .status-quote { color: #D8B4FE; border-color: #A855F7; }
+        .status-converted { color: #6EE7B7; border-color: #10B981; font-weight: 800; }
+        
+        .remarks-input {
+            width: 100%;
+            background: #090D14;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.45rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            resize: vertical;
+            min-height: 48px;
+            font-family: inherit;
+        }
+        .remarks-input:focus { border-color: var(--gold); outline: none; }
+        
+        .save-indicator {
+            font-size: 0.7rem;
+            color: var(--green);
+            display: none;
+        }
+        
+        .gap-box {
+            background: rgba(239, 68, 68, 0.08);
+            border-left: 3px solid #EF4444;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.8rem;
+            color: #FECACA;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .card-actions .btn { flex: 1; font-size: 0.8rem; padding: 0.5rem; }
+        
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 1.5rem;
+        }
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 620px;
+            padding: 2rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--gold);
+            color: #090D14;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            display: none;
+            z-index: 300;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-box">
+            <svg width="36" height="36" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="55" r="42" stroke="#D8AF58" stroke-width="4"/>
+                <path d="M40 75L40 65L55 52L70 52L70 75Z" stroke="#F8FAFC" stroke-width="4" stroke-linejoin="round"/>
+                <circle cx="82" cy="65" r="4" fill="#D8AF58"/>
+                <circle cx="86" cy="63" r="4" fill="#D8AF58"/>
+            </svg>
+            <div>
+                <div class="logo-title">VINESTATE</div>
+                <div class="logo-tag">Google Places Live Lead Engine & CRM</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div id="api-pill-btn" class="api-pill missing" onclick="openAPIKeyModal()">
+                <i data-lucide="key" style="width:14px;height:14px;"></i>
+                <span id="api-pill-label">Configure Places API Key</span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="downloadCSV()">
+                <i data-lucide="download" style="width:14px;height:14px;"></i> Export CSV
+            </button>
+            <div class="target-pill">
+                <i data-lucide="trending-up" style="width:14px;height:14px;"></i>
+                Target: ₹4,00,000 / 4 Months
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- KPI Metrics -->
+        <div class="stats-grid">
+            <div class="stat-card" onclick="quickFilterStatus('all')">
+                <div class="val" id="stat-total">0</div>
+                <div class="lbl">Total Verified Leads</div>
+            </div>
+            <div class="stat-card" onclick="toggleNoWebsiteFilter()">
+                <div class="val" id="stat-no-web" style="color:#EF4444;">0</div>
+                <div class="lbl">⚠️ No Website (Hot Opportunity)</div>
+            </div>
+            <div class="stat-card" onclick="quickFilterStatus('New / Fresh')">
+                <div class="val" id="stat-new" style="color:#93C5FD;">0</div>
+                <div class="lbl">New / Uncalled</div>
+            </div>
+            <div class="stat-card" onclick="quickFilterStatus('Interested')">
+                <div class="val" id="stat-interested" style="color:#86EFAC;">0</div>
+                <div class="lbl">Interested</div>
+            </div>
+            <div class="stat-card" onclick="quickFilterStatus('Follow-up Needed')">
+                <div class="val" id="stat-followup" style="color:#FDE047;">0</div>
+                <div class="lbl">Follow-up Needed</div>
+            </div>
+            <div class="stat-card" onclick="quickFilterStatus('Quotation Sent')">
+                <div class="val" id="stat-quote" style="color:#D8B4FE;">0</div>
+                <div class="lbl">Quotation Sent</div>
+            </div>
+            <div class="stat-card" onclick="quickFilterStatus('Converted / Client Won')">
+                <div class="val" id="stat-converted" style="color:#34D399;">0</div>
+                <div class="lbl">Converted / Won 🏆</div>
+            </div>
+        </div>
+
+        <!-- Live Google Places Extractor Panel -->
+        <div class="extractor-panel">
+            <div class="extractor-top">
+                <div>
+                    <h2><i data-lucide="map-pin" style="color:var(--gold);"></i> Live Google Places Extraction Engine</h2>
+                    <p>Pulls 100% genuine real-world businesses directly from Google Maps with real phone numbers, exact addresses, and verified ratings.</p>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn btn-danger btn-sm" onclick="purgeDemoData()">
+                        <i data-lucide="trash-2" style="width:14px;height:14px;"></i> Purge Demo Data
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="openCustomSearchModal()">
+                        <i data-lucide="search" style="width:14px;height:14px;"></i> Custom Query Search
+                    </button>
+                </div>
+            </div>
+
+            <div class="extractor-form">
+                <div class="filter-group">
+                    <label>Target Industry</label>
+                    <select id="ext-cat" class="form-select">
+                        <option value="MSME / Manufacturing">🏭 MSME & Industrial Manufacturing</option>
+                        <option value="Luxury Villas & Stays">🏰 Luxury Villas & Homestays</option>
+                        <option value="Wineries & Vineyards">🍷 Wineries & Vineyards</option>
+                        <option value="All">🌐 All 3 Categories</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>State</label>
+                    <select id="ext-state" class="form-select" onchange="updateCityOptions()">
+                        <option value="Maharashtra" selected>Maharashtra</option>
+                        <option value="Gujarat">Gujarat</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Haryana">Haryana (NCR)</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh (Noida)</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Goa">Goa</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>City / Industrial Zone</label>
+                    <select id="ext-city" class="form-select">
+                        <option value="Nashik">Nashik (Ambad & Satpur MIDC)</option>
+                        <option value="Sinnar">Sinnar MIDC (Malegaon/Musalgaon)</option>
+                        <option value="Igatpuri">Igatpuri (Villas & Resorts)</option>
+                        <option value="Pune">Pune (Chakan, Bhosari, Talegaon)</option>
+                        <option value="Aurangabad">Chhatrapati Sambhaji Nagar (Waluj MIDC)</option>
+                        <option value="Mumbai">Mumbai / Thane / Navi Mumbai</option>
+                        <option value="Alibaug">Alibaug (Luxury Villas)</option>
+                        <option value="Lonavala">Lonavala (Resorts & Villas)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <button id="btn-extract-live" class="btn btn-gold" style="width:100%;" onclick="triggerBatchExtraction()">
+                        <i data-lucide="zap" style="width:16px;height:16px;"></i> Extract 50 Real Live Leads
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Industry Vertical Segregation Tabs -->
+        <div class="category-tabs">
+            <button class="cat-tab active" id="tab-all" onclick="selectTab('all')">
+                <i data-lucide="layout-grid" style="width:16px;height:16px;"></i> All Verified Leads
+            </button>
+            <button class="cat-tab" id="tab-villa" onclick="selectTab('villa')">
+                <i data-lucide="home" style="width:16px;height:16px;"></i> 🏰 Luxury Villas & Stays
+            </button>
+            <button class="cat-tab" id="tab-winery" onclick="selectTab('winery')">
+                <i data-lucide="wine" style="width:16px;height:16px;"></i> 🍷 Wineries & Vineyards
+            </button>
+            <button class="cat-tab" id="tab-msme" onclick="selectTab('msme')">
+                <i data-lucide="factory" style="width:16px;height:16px;"></i> 🏭 MSMEs & Manufacturing
+            </button>
+        </div>
+
+        <!-- Multi-Filter & Search -->
+        <div class="filter-panel">
+            <div class="filter-group">
+                <label>Filter State</label>
+                <select id="f-state" class="form-select" onchange="applyFilters()">
+                    <option value="all">All States</option>
+                    <option value="maharashtra">Maharashtra</option>
+                    <option value="gujarat">Gujarat</option>
+                    <option value="karnataka">Karnataka</option>
+                    <option value="tamil nadu">Tamil Nadu</option>
+                    <option value="haryana">Haryana</option>
+                    <option value="uttar pradesh">Uttar Pradesh</option>
+                    <option value="rajasthan">Rajasthan</option>
+                    <option value="goa">Goa</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Filter City / Zone</label>
+                <input type="text" id="f-city" class="form-input" placeholder="e.g. Nashik, Sinnar, Igatpuri..." oninput="applyFilters()">
+            </div>
+            <div class="filter-group">
+                <label>Call Status</label>
+                <select id="f-status" class="form-select" onchange="applyFilters()">
+                    <option value="all">All Call Statuses</option>
+                    <option value="New / Fresh">New / Fresh</option>
+                    <option value="Interested">Interested</option>
+                    <option value="Follow-up Needed">Follow-up Needed</option>
+                    <option value="Callback Requested">Callback Requested</option>
+                    <option value="Quotation Sent">Quotation Sent</option>
+                    <option value="Not Interested">Not Interested</option>
+                    <option value="Invalid / Wrong Number">Invalid / Wrong Number</option>
+                    <option value="Converted / Client Won">Converted / Client Won</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Search Business / Phone / PIN</label>
+                <input type="text" id="f-search" class="form-input" placeholder="Search name, PIN code, contact..." oninput="applyFilters()">
+            </div>
+        </div>
+
+        <!-- Leads List View -->
+        <div id="leads-container" class="leads-grid"></div>
+    </main>
+
+    <!-- API Key Settings Modal -->
+    <div id="api-modal" class="modal-overlay" onclick="closeModal(event, 'api-modal')">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                <h3 style="font-size:1.25rem; color:var(--gold); display:flex; align-items:center; gap:0.5rem;">
+                    <i data-lucide="key" style="width:20px;height:20px;"></i> Google Places API Configuration
+                </h3>
+                <button onclick="closeModalDirect('api-modal')" class="btn btn-outline" style="padding:0.35rem 0.65rem;">✕</button>
+            </div>
+            <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1.25rem; line-height:1.5;">
+                Enter your Google Maps / Places API Key (with <strong>Places API</strong> and <strong>Geocoding API</strong> enabled in Google Cloud Console).
+            </p>
+            <div style="margin-bottom:1.5rem;">
+                <label style="display:block; font-size:0.8rem; font-weight:700; color:var(--text-muted); margin-bottom:0.4rem;">Google Places API Key</label>
+                <input type="password" id="input-api-key" class="form-input" placeholder="AIzaSy...">
+                <div id="api-key-status-text" style="font-size:0.775rem; color:var(--text-muted); margin-top:0.4rem;"></div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+                <button class="btn btn-outline" onclick="closeModalDirect('api-modal')">Cancel</button>
+                <button class="btn btn-gold" onclick="saveAPIKey()">
+                    <i data-lucide="save" style="width:16px;height:16px;"></i> Save & Activate Key
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Search Modal -->
+    <div id="custom-search-modal" class="modal-overlay" onclick="closeModal(event, 'custom-search-modal')">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                <h3 style="font-size:1.25rem; color:var(--gold);">Custom Google Places Query</h3>
+                <button onclick="closeModalDirect('custom-search-modal')" class="btn btn-outline" style="padding:0.35rem 0.65rem;">✕</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:1.5rem;">
+                <div>
+                    <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.4rem;">Search Query</label>
+                    <input type="text" id="custom-q" class="form-input" placeholder="e.g. CNC machining Sinnar MIDC or private pool villa Igatpuri">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.4rem;">Category</label>
+                        <select id="custom-cat" class="form-select">
+                            <option value="MSME / Manufacturing">MSME / Manufacturing</option>
+                            <option value="Luxury Villas & Stays">Luxury Villas & Stays</option>
+                            <option value="Wineries & Vineyards">Wineries & Vineyards</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.4rem;">City</label>
+                        <input type="text" id="custom-city" class="form-input" placeholder="e.g. Nashik" value="Nashik">
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+                <button class="btn btn-outline" onclick="closeModalDirect('custom-search-modal')">Cancel</button>
+                <button id="btn-custom-search" class="btn btn-gold" onclick="executeCustomSearch()">
+                    <i data-lucide="search" style="width:16px;height:16px;"></i> Search & Extract
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pitch Modal -->
+    <div id="pitch-modal" class="modal-overlay" onclick="closeModal(event, 'pitch-modal')">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                <h3 id="modal-title" style="font-size:1.25rem; color:var(--gold);">Tailored Cold Call & WhatsApp Pitch Hook</h3>
+                <button onclick="closeModalDirect('pitch-modal')" class="btn btn-outline" style="padding:0.35rem 0.65rem;">✕</button>
+            </div>
+            <div id="modal-content" style="background:#090D14; border:1px solid var(--border); border-radius:8px; padding:1.25rem; font-size:0.925rem; line-height:1.6; margin-bottom:1.5rem; color:#E2E8F0;"></div>
+            <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+                <button class="btn btn-outline" onclick="copyModalPitch()">
+                    <i data-lucide="copy" style="width:16px;height:16px;"></i> Copy Pitch Script
+                </button>
+                <a id="modal-wa-btn" href="#" target="_blank" class="btn btn-green">
+                    <i data-lucide="message-circle" style="width:16px;height:16px;"></i> Send on WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Saved Successfully!</div>
+
+    <script>
+        let allLeads = [];
+        let activeTab = 'all';
+        let noWebsiteOnly = false;
+
+        async function init() {
+            await checkAPIKey();
+            await fetchLeads();
+        }
+
+        async function checkAPIKey() {
+            try {
+                const res = await fetch('/api/settings/api-key');
+                const data = await res.json();
+                const pill = document.getElementById('api-pill-btn');
+                const label = document.getElementById('api-pill-label');
+                const statusTxt = document.getElementById('api-key-status-text');
+
+                if (data.configured) {
+                    pill.className = 'api-pill';
+                    label.innerText = `Places API Active (${data.masked_key})`;
+                    statusTxt.innerText = `Currently active key: ${data.masked_key}`;
+                } else {
+                    pill.className = 'api-pill missing';
+                    label.innerText = `⚠️ Configure Places API Key`;
+                    statusTxt.innerText = 'No API key set yet.';
+                }
+            } catch (e) {}
+        }
+
+        async function saveAPIKey() {
+            const key = document.getElementById('input-api-key').value.trim();
+            if (!key) {
+                showToast('Please enter a valid API Key');
+                return;
+            }
+            try {
+                const res = await fetch('/api/settings/api-key', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_key: key })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('✅ Google Places API Key Saved & Active!');
+                    closeModalDirect('api-modal');
+                    await checkAPIKey();
+                } else {
+                    showToast(`Error: ${data.detail || 'Failed to save'}`);
+                }
+            } catch (e) {
+                showToast('Error saving key');
+            }
+        }
+
+        async function fetchLeads() {
+            try {
+                const res = await fetch('/api/leads');
+                const data = await res.json();
+                allLeads = data.leads || [];
+                updateStats();
+                applyFilters();
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Error fetching leads:', err);
+            }
+        }
+
+        async function updateStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                const st = data.stats;
+                document.getElementById('stat-total').innerText = st.total;
+                document.getElementById('stat-no-web').innerText = st.no_website;
+                document.getElementById('stat-new').innerText = st.new_leads;
+                document.getElementById('stat-interested').innerText = st.interested;
+                document.getElementById('stat-followup').innerText = st.follow_up;
+                document.getElementById('stat-quote').innerText = st.quotation;
+                document.getElementById('stat-converted').innerText = st.converted;
+            } catch (e) {}
+        }
+
+        function updateCityOptions() {
+            const st = document.getElementById('ext-state').value;
+            const citySel = document.getElementById('ext-city');
+            citySel.innerHTML = '';
+            
+            const cityMap = {
+                'Maharashtra': [
+                    { v: 'Nashik', t: 'Nashik (Ambad & Satpur MIDC)' },
+                    { v: 'Sinnar', t: 'Sinnar MIDC (Malegaon/Musalgaon)' },
+                    { v: 'Igatpuri', t: 'Igatpuri (Villas & Resorts)' },
+                    { v: 'Pune', t: 'Pune (Chakan, Bhosari, Talegaon)' },
+                    { v: 'Aurangabad', t: 'Chhatrapati Sambhaji Nagar (Waluj MIDC)' },
+                    { v: 'Mumbai', t: 'Mumbai / Thane / Navi Mumbai' },
+                    { v: 'Alibaug', t: 'Alibaug (Luxury Villas)' },
+                    { v: 'Lonavala', t: 'Lonavala (Resorts & Villas)' }
+                ],
+                'Gujarat': [
+                    { v: 'Vapi', t: 'Vapi GIDC (Chemical & Manufacturing)' },
+                    { v: 'Ahmedabad', t: 'Ahmedabad (Vatva, Naroda, Sanand)' },
+                    { v: 'Surat', t: 'Surat (Sachin & Pandesara GIDC)' },
+                    { v: 'Vadodara', t: 'Vadodara (Makarpura GIDC)' },
+                    { v: 'Ankleshwar', t: 'Ankleshwar GIDC' }
+                ],
+                'Karnataka': [
+                    { v: 'Bengaluru', t: 'Bengaluru (Peenya & Electronic City)' },
+                    { v: 'Coorg', t: 'Coorg (Luxury Stays & Resorts)' },
+                    { v: 'Mysuru', t: 'Mysuru (Hebbal Industrial Area)' }
+                ],
+                'Tamil Nadu': [
+                    { v: 'Chennai', t: 'Chennai (Sriperumbudur & Ambattur)' },
+                    { v: 'Coimbatore', t: 'Coimbatore (Engineering & Textile)' }
+                ],
+                'Haryana': [
+                    { v: 'Gurgaon', t: 'Gurgaon (Manesar Industrial Cluster)' },
+                    { v: 'Faridabad', t: 'Faridabad Industrial Corridor' }
+                ],
+                'Uttar Pradesh': [
+                    { v: 'Noida', t: 'Noida & Greater Noida Industrial' }
+                ],
+                'Rajasthan': [
+                    { v: 'Jaipur', t: 'Jaipur (Sitapura & Mansarovar)' },
+                    { v: 'Udaipur', t: 'Udaipur (Luxury Villas & Resorts)' }
+                ],
+                'Goa': [
+                    { v: 'Goa', t: 'North & South Goa (Luxury Stays & Wineries)' }
+                ]
+            };
+
+            const list = cityMap[st] || [{ v: st, t: st }];
+            list.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.v;
+                opt.innerText = c.t;
+                citySel.appendChild(opt);
+            });
+        }
+
+        async function triggerBatchExtraction() {
+            const btn = document.getElementById('btn-extract-live');
+            const cat = document.getElementById('ext-cat').value;
+            const state = document.getElementById('ext-state').value;
+            const city = document.getElementById('ext-city').value;
+
+            btn.innerHTML = `<i data-lucide="loader-2" class="lucide-spin" style="width:16px;height:16px;"></i> Extracting Live Google Places...`;
+            lucide.createIcons();
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/places/extract-batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        category: cat,
+                        state: state,
+                        city_or_midc: city,
+                        count: 50
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(`🎉 Added ${data.new_leads_added} 100% Real Live Leads from Google Maps!`);
+                    await fetchLeads();
+                } else {
+                    if (data.detail && data.detail.includes('API Key')) {
+                        openAPIKeyModal();
+                    }
+                    showToast(`⚠️ ${data.detail || 'Extraction failed'}`);
+                }
+            } catch (err) {
+                showToast('Network error during Google Places extraction.');
+            } finally {
+                btn.innerHTML = `<i data-lucide="zap" style="width:16px;height:16px;"></i> Extract 50 Real Live Leads`;
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        async function executeCustomSearch() {
+            const q = document.getElementById('custom-q').value.trim();
+            const cat = document.getElementById('custom-cat').value;
+            const city = document.getElementById('custom-city').value.trim() || 'Nashik';
+            const btn = document.getElementById('btn-custom-search');
+
+            if (!q) {
+                showToast('Please enter a query.');
+                return;
+            }
+
+            btn.innerHTML = `<i data-lucide="loader-2" class="lucide-spin" style="width:14px;height:14px;"></i> Searching...`;
+            lucide.createIcons();
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/places/search-live', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: q, category: cat, city: city, limit: 20 })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(`Found ${data.total_found} places! (${data.new_leads_added} new added)`);
+                    closeModalDirect('custom-search-modal');
+                    await fetchLeads();
+                } else {
+                    showToast(`⚠️ ${data.detail || 'Search failed'}`);
+                }
+            } catch (e) {
+                showToast('Search request error');
+            } finally {
+                btn.innerHTML = `<i data-lucide="search" style="width:14px;height:14px;"></i> Search & Extract`;
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        async function purgeDemoData() {
+            if (!confirm('Are you sure you want to purge all demo/synthetic leads? (Only 100% live Google Places leads will be kept).')) return;
+            try {
+                const res = await fetch('/api/admin/purge-demo', { method: 'POST' });
+                const data = await res.json();
+                showToast(data.message);
+                await fetchLeads();
+            } catch (e) {
+                showToast('Error purging demo data');
+            }
+        }
+
+        function selectTab(tab) {
+            activeTab = tab;
+            document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            applyFilters();
+        }
+
+        function renderLeads(leads) {
+            const container = document.getElementById('leads-container');
+            if (leads.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:4rem; color:var(--text-muted); font-size:1.1rem;">
+                    No leads found for current filters.<br><br>
+                    <button class="btn btn-gold btn-sm" onclick="triggerBatchExtraction()">
+                        <i data-lucide="zap" style="width:14px;height:14px;"></i> Extract Live Google Leads Now
+                    </button>
+                </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = leads.map(lead => {
+                const hasWeb = lead.has_website === 1 && lead.website && !lead.website.includes('instagram.com');
+                const webBadge = hasWeb ? 
+                    `<span class="has-website-badge">🌐 Website Active</span>` : 
+                    `<span class="no-website-badge">⚠️ NO WEBSITE (Hot Target)</span>`;
+
+                const mapsBtn = lead.google_maps_url ? 
+                    `<a href="${lead.google_maps_url}" target="_blank" class="maps-verify-badge">
+                        <i data-lucide="external-link" style="width:12px;height:12px;"></i> View on Google Maps
+                    </a>` : '';
+
+                const statusClass = getStatusClass(lead.call_status);
+
+                return `
+                <div class="lead-card" id="card-${lead.id}">
+                    <div>
+                        <div class="card-top-badges">
+                            <div class="badge-left">
+                                <span class="cat-badge">${lead.category.split('/')[0]}</span>
+                                ${webBadge}
+                                ${mapsBtn}
+                            </div>
+                            <span style="font-size:0.8rem; font-weight:700; color:#FBBF24;">${lead.google_rating}</span>
+                        </div>
+
+                        <h3 class="biz-title">${lead.business_name}</h3>
+                        <div class="loc-text">
+                            <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--gold);flex-shrink:0;margin-top:2px;"></i>
+                            <span>${lead.address || (lead.city + ', ' + lead.state + ' ' + lead.pin_code)}</span>
+                        </div>
+
+                        <div class="lead-details-table">
+                            <div class="detail-row">
+                                <span class="detail-lbl">Contact / Phone:</span>
+                                <span class="detail-val" style="color:var(--gold-light); font-size:0.9rem;">${lead.phone || 'N/A'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-lbl">City / Zone:</span>
+                                <span class="detail-val">${lead.city} (${lead.industrial_zone || 'Industrial Cluster'})</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-lbl">PIN Code:</span>
+                                <span class="detail-val">${lead.pin_code || 'Verified Area'}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-lbl">Website / Link:</span>
+                                <span class="detail-val">
+                                    ${lead.website ? `<a href="${lead.website}" target="_blank" style="color:var(--blue); text-decoration:none;">${lead.website.includes('instagram') ? 'Instagram Profile ↗' : 'Official Website ↗'}</a>` : '<span style="color:#EF4444;">No Website Found</span>'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="gap-box">
+                            <strong>Growth Gap:</strong> ${lead.growth_gap}
+                        </div>
+
+                        <!-- CRM CALL STATUS & REMARKS -->
+                        <div class="crm-section">
+                            <div class="crm-header">
+                                <span>📋 Call Status & Follow-Up Log</span>
+                                <span id="save-msg-${lead.id}" class="save-indicator">Saved ✔</span>
+                            </div>
+                            
+                            <div class="crm-grid">
+                                <div>
+                                    <label style="font-size:0.725rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Call Status:</label>
+                                    <select class="status-select ${statusClass}" onchange="saveLeadCRM(${lead.id}, this.value, null, null)">
+                                        <option value="New / Fresh" ${lead.call_status === 'New / Fresh' ? 'selected' : ''}>New / Fresh</option>
+                                        <option value="Interested" ${lead.call_status === 'Interested' ? 'selected' : ''}>Interested</option>
+                                        <option value="Follow-up Needed" ${lead.call_status === 'Follow-up Needed' ? 'selected' : ''}>Follow-up Needed</option>
+                                        <option value="Callback Requested" ${lead.call_status === 'Callback Requested' ? 'selected' : ''}>Callback Requested</option>
+                                        <option value="Quotation Sent" ${lead.call_status === 'Quotation Sent' ? 'selected' : ''}>Quotation Sent</option>
+                                        <option value="Not Interested" ${lead.call_status === 'Not Interested' ? 'selected' : ''}>Not Interested</option>
+                                        <option value="Invalid / Wrong Number" ${lead.call_status === 'Invalid / Wrong Number' ? 'selected' : ''}>Invalid / Wrong Number</option>
+                                        <option value="Converted / Client Won" ${lead.call_status === 'Converted / Client Won' ? 'selected' : ''}>Converted / Client Won</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size:0.725rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Next Follow-up:</label>
+                                    <input type="date" class="form-input" style="padding:0.4rem; font-size:0.8rem;" value="${lead.follow_up_date || ''}" onchange="saveLeadCRM(${lead.id}, null, this.value, null)">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label style="font-size:0.725rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Sales Remarks / Objections:</label>
+                                <textarea class="remarks-input" placeholder="e.g. Spoke with owner. Needs direct booking villa package. Follow up on Friday..." onblur="saveLeadCRM(${lead.id}, null, null, this.value)">${lead.sales_remarks || ''}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn btn-outline" onclick="openPitchModal(${lead.id})">
+                            <i data-lucide="file-text" style="width:14px;height:14px;"></i> Pitch Hook
+                        </button>
+                        <a href="${lead.whatsapp_link}?text=${encodeURIComponent(lead.tailored_pitch_hook)}" target="_blank" class="btn btn-green">
+                            <i data-lucide="message-circle" style="width:14px;height:14px;"></i> WhatsApp
+                        </a>
+                        <a href="tel:${lead.phone.replace(/[^0-9+]/g, '')}" class="btn btn-gold">
+                            <i data-lucide="phone" style="width:14px;height:14px;"></i> Call
+                        </a>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function getStatusClass(status) {
+            if (status === 'Interested') return 'status-interested';
+            if (status === 'Follow-up Needed' || status === 'Callback Requested') return 'status-followup';
+            if (status === 'Quotation Sent') return 'status-quote';
+            if (status === 'Converted / Client Won') return 'status-converted';
+            return 'status-new';
+        }
+
+        async function saveLeadCRM(leadId, callStatus, followUpDate, salesRemarks) {
+            const payload = {};
+            if (callStatus !== null) payload.call_status = callStatus;
+            if (followUpDate !== null) payload.follow_up_date = followUpDate;
+            if (salesRemarks !== null) payload.sales_remarks = salesRemarks;
+
+            try {
+                const res = await fetch(`/api/leads/${leadId}/crm`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    const ind = document.getElementById(`save-msg-${leadId}`);
+                    if (ind) {
+                        ind.style.display = 'inline';
+                        setTimeout(() => { ind.style.display = 'none'; }, 2000);
+                    }
+                    updateStats();
+                }
+            } catch (err) {
+                console.error('Error saving CRM data:', err);
+            }
+        }
+
+        function applyFilters() {
+            const state = document.getElementById('f-state').value.toLowerCase();
+            const city = document.getElementById('f-city').value.toLowerCase().trim();
+            const status = document.getElementById('f-status').value.toLowerCase();
+            const search = document.getElementById('f-search').value.toLowerCase().trim();
+
+            const filtered = allLeads.filter(lead => {
+                const leadCat = (lead.category || '').toLowerCase();
+                const leadState = (lead.state || '').toLowerCase();
+                const leadCity = (lead.city || '').toLowerCase();
+                const leadAddr = (lead.address || '').toLowerCase();
+                const leadZone = (lead.industrial_zone || '').toLowerCase();
+                const leadStatus = (lead.call_status || '').toLowerCase();
+                const leadName = (lead.business_name || '').toLowerCase();
+                const leadDm = (lead.decision_maker || '').toLowerCase();
+
+                if (noWebsiteOnly && lead.has_website === 1 && lead.website && !lead.website.includes('instagram.com')) return false;
+
+                // Category Tabs Filter
+                if (activeTab === 'villa' && !leadCat.includes('villa') && !leadCat.includes('homestay') && !leadCat.includes('resort')) return false;
+                if (activeTab === 'winery' && !leadCat.includes('winery') && !leadCat.includes('vineyard') && !leadCat.includes('wine')) return false;
+                if (activeTab === 'msme' && !leadCat.includes('msme') && !leadCat.includes('machin') && !leadCat.includes('packag') && !leadCat.includes('auto') && !leadCat.includes('fabricat') && !leadCat.includes('electric') && !leadCat.includes('stamping') && !leadCat.includes('manufactur') && !leadCat.includes('industr')) return false;
+
+                if (state !== 'all' && !leadState.includes(state) && !leadAddr.includes(state)) return false;
+                if (city && !leadCity.includes(city) && !leadAddr.includes(city) && !leadZone.includes(city)) return false;
+                if (status !== 'all' && leadStatus !== status) return false;
+
+                if (search) {
+                    if (!leadName.includes(search) && !leadAddr.includes(search) && !leadDm.includes(search) && !(lead.phone || '').includes(search) && !(lead.pin_code || '').includes(search)) return false;
+                }
+
+                return true;
+            });
+
+            renderLeads(filtered);
+        }
+
+        function toggleNoWebsiteFilter() {
+            noWebsiteOnly = !noWebsiteOnly;
+            showToast(noWebsiteOnly ? 'Filtered: Showing only businesses without official website.' : 'Showing all businesses.');
+            applyFilters();
+        }
+
+        function quickFilterStatus(status) {
+            document.getElementById('f-status').value = status;
+            applyFilters();
+        }
+
+        let currentModalPitch = '';
+        function openPitchModal(leadId) {
+            const lead = allLeads.find(l => l.id === leadId);
+            if (!lead) return;
+            document.getElementById('modal-title').innerText = `${lead.business_name} — Tailored Pitch Hook`;
+            document.getElementById('modal-content').innerText = lead.tailored_pitch_hook;
+            document.getElementById('modal-wa-btn').href = `${lead.whatsapp_link}?text=${encodeURIComponent(lead.tailored_pitch_hook)}`;
+            currentModalPitch = lead.tailored_pitch_hook;
+            document.getElementById('pitch-modal').style.display = 'flex';
+        }
+
+        function openAPIKeyModal() { document.getElementById('api-modal').style.display = 'flex'; }
+        function openCustomSearchModal() { document.getElementById('custom-search-modal').style.display = 'flex'; }
+        function closeModalDirect(modalId) { document.getElementById(modalId).style.display = 'none'; }
+        function closeModal(e, modalId) { if (e.target === document.getElementById(modalId)) closeModalDirect(modalId); }
+
+        function copyModalPitch() { navigator.clipboard.writeText(currentModalPitch); showToast('Pitch script copied to clipboard!'); }
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 2800);
+        }
+
+        function downloadCSV() {
+            const state = document.getElementById('f-state').value;
+            const city = document.getElementById('f-city').value;
+            const status = document.getElementById('f-status').value;
+            window.location.href = `/api/download/csv?category=${activeTab}&state=${state}&city=${city}&status=${status}`;
+        }
+
+        init();
+    </script>
+</body>
+</html>

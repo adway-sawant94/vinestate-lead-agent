@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agency Skills Learning Checklist</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --card:#181b22;
+    --border:#2a2e38;
+    --text:#e8e9ec;
+    --muted:#9aa0ac;
+    --accent:#6c8cff;
+    --done:#3ddc84;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:16px;
+    padding-bottom:80px;
+  }
+  header{
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    padding:8px 0 16px;
+    z-index:10;
+  }
+  h1{
+    font-size:1.3rem;
+    margin:0 0 10px;
+  }
+  .progress-wrap{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 14px;
+  }
+  .progress-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+    font-size:0.9rem;
+    color:var(--muted);
+  }
+  .progress-bar-bg{
+    background:#2a2e38;
+    border-radius:8px;
+    height:10px;
+    overflow:hidden;
+  }
+  .progress-bar-fill{
+    background:linear-gradient(90deg,var(--accent),var(--done));
+    height:100%;
+    width:0%;
+    transition:width 0.3s ease;
+  }
+  .controls{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  button{
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  button:active{
+    transform:scale(0.97);
+  }
+  .level{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    margin-top:14px;
+    overflow:hidden;
+  }
+  .level-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .level-title{
+    font-weight:600;
+    font-size:1rem;
+  }
+  .level-count{
+    font-size:0.8rem;
+    color:var(--muted);
+    white-space:nowrap;
+    margin-left:10px;
+  }
+  .chevron{
+    transition:transform 0.2s ease;
+    margin-left:8px;
+    color:var(--muted);
+  }
+  .level.collapsed .chevron{
+    transform:rotate(-90deg);
+  }
+  .level-body{
+    padding:0 14px 12px;
+  }
+  .level.collapsed .level-body{
+    display:none;
+  }
+  .subgroup-title{
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--muted);
+    margin:12px 0 6px;
+  }
+  .item{
+    display:flex;
+    align-items:center;
+    padding:8px 4px;
+    border-bottom:1px solid #22252d;
+    font-size:0.95rem;
+  }
+  .item:last-child{
+    border-bottom:none;
+  }
+  .item input[type="checkbox"]{
+    width:20px;
+    height:20px;
+    margin-right:12px;
+    accent-color:var(--done);
+    flex-shrink:0;
+  }
+  .item label{
+    flex:1;
+  }
+  .item.checked label{
+    color:var(--muted);
+    text-decoration:line-through;
+  }
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.75rem;
+    margin-top:20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Agency Skills Learning Checklist</h1>
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <span id="progressText">0 / 0 completed</span>
+      <span id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="controls">
+      <button onclick="expandAll()">Expand all</button>
+      <button onclick="collapseAll()">Collapse all</button>
+      <button onclick="resetAll()">Reset all ticks</button>
+    </div>
+  </div>
+</header>
+
+<div id="checklist"></div>
+
+<footer>Your progress is saved automatically on this device/browser.</footer>
+
+<script>
+const data = [
+  {level:"LEVEL 1: Business Fundamentals (Foundation)", groups:[
+    {name:"Business Basics", items:["Business models (B2B, B2C, D2C, SaaS, Agency)","Revenue vs Profit","Gross Margin","Net Margin","Cash Flow","Working Capital"]},
+    {name:"Business Operations", items:["Pricing Strategies","Value Proposition","Market Positioning","Customer Lifetime Value (LTV)","Customer Acquisition Cost (CAC)","Unit Economics"]},
+    {name:"Finance", items:["Profit & Loss (P&L)","Balance Sheet","Cash Flow Statement","GST basics","Invoicing","Quotations","Proposals","Taxes","Budgeting"]}
+  ]},
+  {level:"LEVEL 2: Communication Skills", groups:[
+    {name:null, items:["Professional English","Business Hindi","Business Email Writing","Proposal Writing","Presentation Skills","Storytelling","Active Listening","Negotiation","Public Speaking","Discovery Calls","Client Requirement Gathering"]}
+  ]},
+  {level:"LEVEL 3: Sales (Most Important)", groups:[
+    {name:"Master", items:["Cold Calling","Cold Email","LinkedIn Outreach","WhatsApp Outreach","Referral Systems","Sales Funnels","Consultative Selling","SPIN Selling","Challenger Sales","Objection Handling","Closing Techniques","Follow-up Systems","CRM Usage"]},
+    {name:"Practice", items:["50 sales calls","100 cold emails","100 LinkedIn messages"]}
+  ]},
+  {level:"LEVEL 4: Branding", groups:[
+    {name:null, items:["Brand Strategy","Logo Principles","Typography","Color Psychology","Brand Positioning","Tone of Voice","Brand Guidelines","Company Profiles","Pitch Deck Design"]},
+    {name:"Tools", items:["Figma","Canva","Adobe Express"]}
+  ]},
+  {level:"LEVEL 5: UI/UX Design", groups:[
+    {name:"Understand", items:["User Experience","User Interface","Wireframing","Information Architecture","Mobile First Design","Responsive Design","Accessibility","Design Systems","Landing Page Psychology"]},
+    {name:"Tools", items:["Figma (must)","Framer (optional)"]}
+  ]},
+  {level:"LEVEL 6: Website Development", groups:[
+    {name:"Learn", items:["HTML","CSS","JavaScript basics","WordPress","Elementor","Shopify","Webflow","Domain & Hosting","DNS","SSL","CDN","Website Security","Website Speed Optimization","Backup & Recovery"]},
+    {name:"Advanced", items:["React (optional)","Next.js (optional)"]}
+  ]},
+  {level:"LEVEL 7: SEO", groups:[
+    {name:"Master", items:["Keyword Research","Search Intent","Technical SEO","On-Page SEO","Off-Page SEO","Local SEO","Google Business Profile","Schema Markup","Site Architecture","Link Building","Content SEO","SEO Audits"]},
+    {name:"Tools", items:["Google Search Console","Ahrefs","SEMrush","Screaming Frog"]}
+  ]},
+  {level:"LEVEL 8: Digital Marketing", groups:[
+    {name:"Google Ads", items:["Search","Display","Performance Max","Shopping","Remarketing"]},
+    {name:"Meta Ads", items:["Facebook","Instagram","Retargeting","Lookalike Audiences"]},
+    {name:"Other Channels", items:["LinkedIn Ads","Email Marketing","WhatsApp Marketing","SMS Marketing","Marketing Automation","Conversion Rate Optimization (CRO)"]}
+  ]},
+  {level:"LEVEL 9: Social Media", groups:[
+    {name:null, items:["Content Strategy","Content Calendar","Instagram Growth","LinkedIn Personal Branding","Facebook Marketing","YouTube","Reels Strategy","Short-form Video","Community Management"]}
+  ]},
+  {level:"LEVEL 10: Content Creation", groups:[
+    {name:null, items:["Copywriting","Headlines","CTAs","Sales Pages","Email Copy","Blog Writing","SEO Content","Case Studies","Testimonials","Scripts"]}
+  ]},
+  {level:"LEVEL 11: Graphic Design", groups:[
+    {name:null, items:["Canva","Figma","Photoshop basics","Social Media Design","Ad Creatives","Brochures","Catalogs","Pitch Decks","Infographics"]}
+  ]},
+  {level:"LEVEL 12: Video Editing", groups:[
+    {name:"Software", items:["CapCut","Premiere Pro","DaVinci Resolve"]},
+    {name:"Learn", items:["Reels","YouTube","Motion Graphics","Color Correction","Captions"]}
+  ]},
+  {level:"LEVEL 13: AI", groups:[
+    {name:"Master", items:["ChatGPT","Claude","Gemini","Perplexity"]},
+    {name:"Learn", items:["Prompt Engineering","AI Research","AI Copywriting","AI Images","AI Video","AI Voice","AI Coding"]},
+    {name:"Automation", items:["Make","Zapier","n8n"]},
+    {name:"Advanced AI", items:["AI Chatbots","AI Agents","RAG","Vector Databases"]}
+  ]},
+  {level:"LEVEL 14: CRM", groups:[
+    {name:"Learn", items:["Zoho","HubSpot","GoHighLevel"]},
+    {name:"Understand", items:["Lead Management","Pipeline","Tasks","Automations","Reports"]}
+  ]},
+  {level:"LEVEL 15: Business Automation", groups:[
+    {name:null, items:["Workflow Mapping","SOP Creation","CRM Integration","ERP Basics","Inventory Systems","Invoice Automation","HR Automation","Approval Workflows"]}
+  ]},
+  {level:"LEVEL 16: Analytics", groups:[
+    {name:null, items:["Google Analytics 4","Google Tag Manager","Looker Studio","Power BI (optional)","KPIs","Dashboards","Attribution","Funnels","Heatmaps","A/B Testing"]}
+  ]},
+  {level:"LEVEL 17: Consulting", groups:[
+    {name:null, items:["Business Audits","SWOT","Porter's Five Forces","Value Chain Analysis","Business Model Canvas","Customer Journey Mapping","Process Improvement","Digital Transformation Strategy","AI Readiness Assessment"]}
+  ]},
+  {level:"LEVEL 18: Project Management", groups:[
+    {name:"Learn", items:["Scope Management","Timelines","Milestones","Risk Management","Agile Basics","Scrum Basics","Kanban","Client Reporting"]},
+    {name:"Tools", items:["Notion","ClickUp","Asana","Trello"]}
+  ]},
+  {level:"LEVEL 19: Legal & Operations", groups:[
+    {name:null, items:["GST Registration","MSME Registration","Contracts","Service Agreements","NDAs","Invoices","Payment Terms","Privacy Policy","Terms & Conditions","Copyright Basics"]}
+  ]},
+  {level:"LEVEL 20: Hiring & Leadership", groups:[
+    {name:null, items:["Hiring","Interviewing","Delegation","SOPs","Performance Reviews","Team Communication","Conflict Resolution","Leadership"]}
+  ]},
+  {level:"LEVEL 21: Industry Specialization", groups:[
+    {name:"MSMEs", items:["Manufacturing workflow","Procurement","Production","Inventory","Vendor management","Sales cycle"]},
+    {name:"Wineries", items:["Wine tourism","Booking systems","Membership programs","Event management","Hospitality operations"]},
+    {name:"Luxury Villas", items:["OTAs (Airbnb, Booking.com)","Revenue management","Dynamic pricing","Guest lifecycle","Reputation management"]}
+  ]},
+  {level:"LEVEL 22: Soft Skills", groups:[
+    {name:null, items:["Critical Thinking","Problem Solving","Decision Making","Emotional Intelligence","Time Management","Productivity","Networking","Personal Branding"]}
+  ]},
+  {level:"Software Stack to Master", groups:[
+    {name:"Design", items:["Figma","Canva"]},
+    {name:"Websites", items:["WordPress","Elementor","Shopify","Webflow"]},
+    {name:"Marketing", items:["Google Ads","Meta Ads","LinkedIn Campaign Manager","SEO (Ahrefs, SEMrush, Google Search Console)"]},
+    {name:"AI", items:["ChatGPT","Claude","Gemini","Make","n8n","Zapier"]},
+    {name:"CRM", items:["HubSpot","Zoho CRM","GoHighLevel"]},
+    {name:"Project Management", items:["ClickUp","Notion"]},
+    {name:"Analytics", items:["GA4","GTM","Looker Studio"]}
+  ]},
+  {level:"Skills That Make You Premium (Top 10)", groups:[
+    {name:null, items:["Business Consulting","Sales & Negotiation","Website Strategy (not just design)","SEO","Google Ads","AI Automation (n8n, Make, ChatGPT)","CRM Implementation","Copywriting","Analytics & Dashboards","Project Management"]}
+  ]}
+];
+
+const STORAGE_KEY = "agencyChecklistState_v1";
+let state = {};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state = raw ? JSON.parse(raw) : {};
+  }catch(e){
+    state = {};
+  }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){}
+}
+
+function makeId(levelIdx, groupIdx, itemIdx){
+  return "L"+levelIdx+"_G"+groupIdx+"_I"+itemIdx;
+}
+
+function render(){
+  const container = document.getElementById("checklist");
+  container.innerHTML = "";
+  let totalItems = 0, totalChecked = 0;
+
+  data.forEach((lvl, li)=>{
+    const levelDiv = document.createElement("div");
+    levelDiv.className = "level";
+    levelDiv.id = "level_"+li;
+
+    const header = document.createElement("div");
+    header.className = "level-header";
+    header.onclick = ()=> toggleCollapse(li);
+
+    const titleSpan = document.createElement("span");
+    titleSpan.className = "level-title";
+    titleSpan.textContent = lvl.level;
+
+    const rightWrap = document.createElement("span");
+    rightWrap.style.display="flex";
+    rightWrap.style.alignItems="center";
+
+    const countSpan = document.createElement("span");
+    countSpan.className = "level-count";
+    countSpan.id = "count_"+li;
+
+    const chevron = document.createElement("span");
+    chevron.className = "chevron";
+    chevron.textContent = "▾";
+
+    rightWrap.appendChild(countSpan);
+    rightWrap.appendChild(chevron);
+    header.appendChild(titleSpan);
+    header.appendChild(rightWrap);
+
+    const body = document.createElement("div");
+    body.className = "level-body";
+
+    let levelTotal = 0, levelChecked = 0;
+
+    lvl.groups.forEach((grp, gi)=>{
+      if(grp.name){
+        const st = document.createElement("div");
+        st.className = "subgroup-title";
+        st.textContent = grp.name;
+        body.appendChild(st);
+      }
+      grp.items.forEach((itemText, ii)=>{
+        totalItems++; levelTotal++;
+        const id = makeId(li, gi, ii);
+        const checked = !!state[id];
+        if(checked){ totalChecked++; levelChecked++; }
+
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "item" + (checked ? " checked" : "");
+        itemDiv.id = "item_"+id;
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = checked;
+        cb.id = "cb_"+id;
+        cb.onchange = ()=> toggleItem(id, li);
+
+        const label = document.createElement("label");
+        label.htmlFor = "cb_"+id;
+        label.textContent = itemText;
+
+        itemDiv.appendChild(cb);
+        itemDiv.appendChild(label);
+        body.appendChild(itemDiv);
+      });
+    });
+
+    countSpan.textContent = levelChecked + "/" + levelTotal;
+    levelDiv.appendChild(header);
+    levelDiv.appendChild(body);
+    container.appendChild(levelDiv);
+  });
+
+  updateProgress(totalChecked, totalItems);
+}
+
+function toggleItem(id, levelIdx){
+  state[id] = !state[id];
+  saveState();
+  render();
+}
+
+function updateProgress(checked, total){
+  const pct = total ? Math.round((checked/total)*100) : 0;
+  document.getElementById("progressText").textContent = checked + " / " + total + " completed";
+  document.getElementById("progressPercent").textContent = pct + "%";
+  document.getElementById("progressBar").style.width = pct + "%";
+}
+
+function toggleCollapse(li){
+  const el = document.getElementById("level_"+li);
+  el.classList.toggle("collapsed");
+}
+
+function expandAll(){
+  document.querySelectorAll(".level").forEach(el=> el.classList.remove("collapsed"));
+}
+function collapseAll(){
+  document.querySelectorAll(".level").forEach(el=> el.classList.add("collapsed"));
+}
+function resetAll(){
+  if(confirm("Reset all ticks? This cannot be undone.")){
+    state = {};
+    saveState();
+    render();
+  }
+}
+
+loadState();
+render();
+</script>
+
+</body>
+</html>
